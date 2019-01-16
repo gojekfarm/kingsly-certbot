@@ -1,12 +1,9 @@
-<<<<<<< HEAD
-=======
 # rspec failure tracking
 .rspec_status
 
 # swap files
 *.swp
 
->>>>>>> git init
 *.gem
 *.rbc
 /.config
