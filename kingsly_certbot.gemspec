@@ -1,11 +1,11 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "kingsly/certbot/version"
+require "kingsly_certbot/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "kingsly-certbot"
-  spec.version       = Kingsly::Certbot::VERSION
+  spec.name          = "kingsly_certbot"
+  spec.version       = KingslyCertbot::VERSION
   spec.authors       = ["Tasdik Rahman"]
   spec.email         = ["tasdik.rahman@go-jek.com"]
 

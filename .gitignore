@@ -1,6 +1,7 @@
 # rspec failure tracking
 .rspec_status
 
+*.idea/
 # swap files
 *.swp
 
