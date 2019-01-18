@@ -4,19 +4,7 @@ kingsly-certbot would update the local certs and update them from the ones gener
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'kingsly-certbot'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install kingsly-certbot
+TODO: Write installion instructions here
 
 ## Usage
 
