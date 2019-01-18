@@ -35,7 +35,12 @@ module KingslyCertbot
         return nil
       end
 
-      return CertBundle.new(resp.body['private_key'], resp.body['full_chain'])
+      if resp.code == '401'
+        raise 'Authentication failure with kingsly, Please check your authentication configuration'
+      else
+        body = JSON.parse(resp.body)
+        return CertBundle.new(body['private_key'], body['full_chain'])
+      end
     end
   end
 end
