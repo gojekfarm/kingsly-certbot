@@ -31,8 +31,7 @@ module KingslyCertbot
           http_request.post(uri.path, JSON.dump(body), headers)
         }
       rescue Exception => e
-        puts e.message
-        return nil
+        raise e.message
       end
 
       if resp.code == '401'

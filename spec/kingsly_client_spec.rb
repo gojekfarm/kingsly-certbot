@@ -56,4 +56,11 @@ RSpec.describe KingslyCertbot::KingslyClient do
     expect{KingslyCertbot::KingslyClient.get_cert_bundle(top_level_domain, sub_domain)}.to raise_error(RuntimeError,
     'Authentication failure with kingsly, Please check your authentication configuration')
   end
+
+  it 'raises timeout exception when the http_read_timeout exceeds' do
+    stub_request(:post, "http://kingsly.something.com/v1/cert_bundles").to_timeout
+
+    expect{KingslyCertbot::KingslyClient.get_cert_bundle(top_level_domain, sub_domain)}.to raise_error(RuntimeError,
+                                                                                                       'execution expired')
+  end
 end
