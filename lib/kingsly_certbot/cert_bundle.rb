@@ -1,23 +1,29 @@
+require 'fileutils'
+
 module KingslyCertbot
   class CertBundle
-    attr_reader :private_key, :full_chain
-    def initialize(private_key, full_chain)
+    attr_reader :tld, :subdomain, :private_key, :full_chain
+
+    def initialize(tld, subdomain, private_key, full_chain)
+      @tld = tld
+      @subdomain = subdomain
       @private_key = private_key
-      @full_chain  = full_chain
+      @full_chain = full_chain
     end
 
-    def ==(other_cert_bundle)
-      (@private_key == other_cert_bundle.private_key) && (@full_chain == other_cert_bundle.full_chain)
+    def ==(other)
+      return false if other.class != self.class
+      self.state == other.state
     end
 
     def hash
-      @private_key.hash + @full_chain.hash
+      state.hash
     end
 
-    def save_to_file(file_path)
-      # TODO: write to file
-      puts @private_key
-      puts @full_chain
+    protected
+
+    def state
+      [tld, subdomain, private_key, full_chain]
     end
   end
 end
