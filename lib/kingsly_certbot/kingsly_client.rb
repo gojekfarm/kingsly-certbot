@@ -38,7 +38,7 @@ module KingslyCertbot
         raise 'Authentication failure with kingsly, Please check your authentication configuration'
       else
         body = JSON.parse(resp.body)
-        return CertBundle.new(body['private_key'], body['full_chain'])
+        return CertBundle.new(top_level_domain, sub_domain, body['private_key'], body['full_chain'])
       end
     end
   end

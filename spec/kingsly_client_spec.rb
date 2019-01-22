@@ -35,7 +35,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
       sub_domain
     )
 
-    expected_cert_bundle = KingslyCertbot::CertBundle.new(private_key = 'test_private_key', full_chain = 'test_full_chain')
+    expected_cert_bundle = KingslyCertbot::CertBundle.new('golabs.io', 'sample-integration-cert', 'test_private_key', 'test_full_chain')
 
     expect(cert_bundle).to eq(expected_cert_bundle)
   end
