@@ -3,6 +3,8 @@ require 'spec_helper'
 RSpec.describe KingslyCertbot::KingslyClient do
   let(:top_level_domain) { 'golabs.io' }
   let(:sub_domain) { 'sample-integration-cert' }
+  let(:private_key) {"-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n"}
+  let(:full_chain) {"-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"}
 
   before :all do
     KingslyCertbot.configure do |config|
@@ -25,9 +27,9 @@ RSpec.describe KingslyCertbot::KingslyClient do
         }
       )
       .to_return(
-        status: 200,
-        body: '{"private_key":"test_private_key", "full_chain":"test_full_chain"}',
-        headers: {}
+          status: 200,
+          body: {private_key: private_key, full_chain: full_chain}.to_json,
+          headers: {}
       )
 
     cert_bundle = KingslyCertbot::KingslyClient.get_cert_bundle(
@@ -35,7 +37,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
       sub_domain
     )
 
-    expected_cert_bundle = KingslyCertbot::CertBundle.new('golabs.io', 'sample-integration-cert', 'test_private_key', 'test_full_chain')
+    expected_cert_bundle = KingslyCertbot::CertBundle.new('golabs.io', 'sample-integration-cert', private_key, full_chain)
 
     expect(cert_bundle).to eq(expected_cert_bundle)
   end

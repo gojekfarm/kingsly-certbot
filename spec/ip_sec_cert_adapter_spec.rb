@@ -17,7 +17,12 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
     it 'should replace old files to backup folder named as current timestamp' do
       tld = 'example.com'
       subdomain = 'www'
-      cert_bundle = KingslyCertbot::CertBundle.new(tld, subdomain, 'private_key', 'full_chain')
+      cert_bundle = KingslyCertbot::CertBundle.new(
+          tld,
+          subdomain,
+          "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
+          "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
+      )
       allow(Time).to receive_message_chain(:now, :strftime).and_return('20190121_172725')
       expect(FileUtils).to receive(:mkdir_p).with('/etc/ipsec.d/backup/20190121_172725')
       expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.private", force: true)
@@ -29,7 +34,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
 
       cert_file_double = File.instance_double('File')
       expect(File).to receive(:open).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", 'w').and_yield(cert_file_double)
-      expect(cert_file_double).to receive(:write).with(cert_bundle.private_key)
+      expect(cert_file_double).to receive(:write).with(cert_bundle.full_chain)
 
       adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
       adapter.update_assets

@@ -24,7 +24,7 @@ module KingslyCertbot
       end
 
       File.open("#{CERTS_DIR}/#{cert_filename}", 'w') do |f|
-        f.write(@cert_bundle.private_key)
+        f.write(@cert_bundle.full_chain)
       end
     end
 
