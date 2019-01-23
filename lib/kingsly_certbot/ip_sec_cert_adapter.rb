@@ -27,5 +27,14 @@ module KingslyCertbot
         f.write(@cert_bundle.private_key)
       end
     end
+
+    def restart_service
+      result = %x[ipsec restart]
+      STDERR.puts "ipsec restart command failed with exitstatus: '#{result.exitstatus}'" unless result.success?
+      result.success?
+    rescue StandardError => e
+      STDERR.puts "ipsec restart command failed with error message: '#{e.message}'"
+      false
+    end
   end
 end
