@@ -1,15 +1,15 @@
 require 'spec_helper'
 include RSpec::Mocks::ExampleMethods
 
-RSpec.describe KingslyCertbot::IpSecCertFileAdapter do
+RSpec.describe KingslyCertbot::IpSecCertAdapter do
   context 'guard clause' do
     it 'raises exception if passed parameter not of type CertBundle' do
-      expect {KingslyCertbot::IpSecCertFileAdapter.new(nil)}.to raise_exception('passed parameter not of type CertBundle')
-      expect {KingslyCertbot::IpSecCertFileAdapter.new(Object.new)}.to raise_exception('passed parameter not of type CertBundle')
+      expect {KingslyCertbot::IpSecCertAdapter.new(nil)}.to raise_exception('passed parameter not of type CertBundle')
+      expect {KingslyCertbot::IpSecCertAdapter.new(Object.new)}.to raise_exception('passed parameter not of type CertBundle')
     end
 
     it 'should not raise exception if valid parameter is passed' do
-      KingslyCertbot::IpSecCertFileAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
+      KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
     end
   end
 
@@ -31,8 +31,8 @@ RSpec.describe KingslyCertbot::IpSecCertFileAdapter do
       expect(File).to receive(:open).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", 'w').and_yield(cert_file_double)
       expect(cert_file_double).to receive(:write).with(cert_bundle.private_key)
 
-      adapter = KingslyCertbot::IpSecCertFileAdapter.new(cert_bundle)
-      adapter.write_cert_files
+      adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
+      adapter.update_assets
     end
   end
 end

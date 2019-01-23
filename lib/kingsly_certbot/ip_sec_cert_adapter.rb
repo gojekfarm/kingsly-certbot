@@ -1,5 +1,5 @@
 module KingslyCertbot
-  class IpSecCertFileAdapter
+  class IpSecCertAdapter
 
     CERT_BACKUP_DIR = '/etc/ipsec.d/backup'
     CERT_PRIVATE_DIR = '/etc/ipsec.d/private'
@@ -10,7 +10,7 @@ module KingslyCertbot
       @cert_bundle = cert_bundle
     end
 
-    def write_cert_files
+    def update_assets
       time = Time.now.strftime('%Y%m%d_%H%M%S')
       backup_dir = "#{CERT_BACKUP_DIR}/#{time}"
       cert_filename = "#{@cert_bundle.subdomain}.#{@cert_bundle.tld}.pem"
