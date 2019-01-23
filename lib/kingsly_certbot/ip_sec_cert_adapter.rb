@@ -11,19 +11,32 @@ module KingslyCertbot
     end
 
     def update_assets
-      time = Time.now.strftime('%Y%m%d_%H%M%S')
-      backup_dir = "#{CERT_BACKUP_DIR}/#{time}"
       cert_filename = "#{@cert_bundle.subdomain}.#{@cert_bundle.tld}.pem"
+      private_key_filepath = "#{CERT_PRIVATE_DIR}/#{cert_filename}"
+      cert_filepath = "#{CERTS_DIR}/#{cert_filename}"
 
-      FileUtils.mkdir_p(backup_dir)
-      FileUtils.mv("#{CERT_PRIVATE_DIR}/#{cert_filename}", "#{backup_dir}/#{cert_filename}.private", force: true)
-      FileUtils.mv("#{CERTS_DIR}/#{cert_filename}", "#{backup_dir}/#{cert_filename}.certs", force: true)
+      if File.exist?(private_key_filepath) && File.exist?(cert_filepath)
+        existing_private_key_content = File.read(private_key_filepath)
+        existing_cert_content = File.read(cert_filepath)
+        if existing_private_key_content == @cert_bundle.private_key && existing_cert_content == @cert_bundle.full_chain
+          STDOUT.puts 'New certificate file is same as old cert file, skipping updating certificates'
+          return
+        else
+          time = Time.now.strftime('%Y%m%d_%H%M%S')
+          backup_dir = "#{CERT_BACKUP_DIR}/#{time}"
+          STDOUT.puts "Taking backup of existing certificates to #{backup_dir}"
 
-      File.open("#{CERT_PRIVATE_DIR}/#{cert_filename}", 'w') do |f|
+          FileUtils.mkdir_p(backup_dir)
+          FileUtils.mv(private_key_filepath, "#{backup_dir}/#{cert_filename}.private", force: true)
+          FileUtils.mv(cert_filepath, "#{backup_dir}/#{cert_filename}.certs", force: true)
+        end
+      end
+
+      File.open(private_key_filepath, 'w') do |f|
         f.write(@cert_bundle.private_key)
       end
 
-      File.open("#{CERTS_DIR}/#{cert_filename}", 'w') do |f|
+      File.open(cert_filepath, 'w') do |f|
         f.write(@cert_bundle.full_chain)
       end
     end

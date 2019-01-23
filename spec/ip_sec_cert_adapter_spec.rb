@@ -14,30 +14,81 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   end
 
   context 'write_cert_files' do
-    it 'should replace old files to backup folder named as current timestamp' do
-      tld = 'example.com'
-      subdomain = 'www'
-      cert_bundle = KingslyCertbot::CertBundle.new(
-          tld,
-          subdomain,
-          "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
-          "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
-      )
-      allow(Time).to receive_message_chain(:now, :strftime).and_return('20190121_172725')
-      expect(FileUtils).to receive(:mkdir_p).with('/etc/ipsec.d/backup/20190121_172725')
-      expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.private", force: true)
-      expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.certs", force: true)
+    let(:tld) {'example.com'}
+    let(:subdomain) {'www'}
+    let(:cert_bundle) {KingslyCertbot::CertBundle.new(
+        tld,
+        subdomain,
+        "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
+        "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
+    )}
 
-      private_file_double = File.instance_double('File')
-      expect(File).to receive(:open).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", 'w').and_yield(private_file_double)
-      expect(private_file_double).to receive(:write).with(cert_bundle.private_key)
 
-      cert_file_double = File.instance_double('File')
-      expect(File).to receive(:open).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", 'w').and_yield(cert_file_double)
-      expect(cert_file_double).to receive(:write).with(cert_bundle.full_chain)
+    it 'should just create new cert files if old files do not exists' do
+      expect(File).to receive(:exist?).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return(true)
+      expect(File).to receive(:exist?).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return(false)
+
+      expect(FileUtils).to_not receive(:mkdir_p)
+      expect(FileUtils).to_not receive(:mv)
+
+      expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
+      expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
 
       adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
       adapter.update_assets
+    end
+
+    context 'old cert files exists' do
+      before(:each) do
+        allow(Time).to receive_message_chain(:now, :strftime).and_return('20190121_172725')
+        expect(File).to receive(:exist?).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return(true)
+        expect(File).to receive(:exist?).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return(true)
+      end
+
+      it 'should replace old files to backup folder named as current timestamp' do
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nDIFFERENT FOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+
+        expect(FileUtils).to receive(:mkdir_p).with('/etc/ipsec.d/backup/20190121_172725')
+        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.private", force: true)
+        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.certs", force: true)
+
+        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+
+        expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
+        expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
+
+        adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
+        adapter.update_assets
+      end
+
+      it 'should not replace the existing cert file if the content is same for both fullchain and private key' do
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+        expect(STDOUT).to receive(:puts).with('New certificate file is same as old cert file, skipping updating certificates')
+        adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
+        adapter.update_assets
+      end
+
+      it 'should replace the existing cert file if the content is not same for fullchain but same for private key' do
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nDifferent cert...\n-----END CERTIFICATE-----\n")
+        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+        expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
+        expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
+        adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
+        adapter.update_assets
+      end
+
+      it 'should replace the existing private key if the content is not same for private key but same for fullchain' do
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA DIFFERENT PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+        expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
+        expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
+        adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
+        adapter.update_assets
+      end
     end
   end
 
@@ -61,5 +112,11 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       expect(STDERR).to receive(:puts).with("ipsec restart command failed with error message: 'failed to find command ipsec'")
       expect(adapter.restart_service).to eq(false)
     end
+  end
+
+  def expect_to_write_to_file(filepath, file_content)
+    file_double = File.instance_double('File')
+    expect(File).to receive(:open).with(filepath, 'w').and_yield(file_double)
+    expect(file_double).to receive(:write).with(file_content)
   end
 end
