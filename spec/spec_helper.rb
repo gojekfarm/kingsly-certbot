@@ -1,5 +1,5 @@
-require "bundler/setup"
-require "kingsly_certbot"
+require 'bundler/setup'
+require 'kingsly_certbot'
 require 'webmock/rspec'
 
 RSpec.configure do |config|

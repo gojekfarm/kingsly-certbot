@@ -1,8 +1,8 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe KingslyCertbot do
   let(:kingsly_host) { 'kingsly.something.com' }
-  it "allows configuration for fetching kingsly certbot" do
+  it 'allows configuration for fetching kingsly certbot' do
     KingslyCertbot.configure do |config|
       config.kingsly_host = kingsly_host
     end

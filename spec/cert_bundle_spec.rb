@@ -19,7 +19,7 @@ RSpec.describe KingslyCertbot::CertBundle do
       expect(first).to_not eq(Object.new)
     end
 
-    it "should return false if attribute is different is different" do
+    it 'should return false if attribute is different is different' do
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', 'private', 'full_chain'))
           .to_not eq(KingslyCertbot::CertBundle.new('otherexample.com', 'www', 'private', 'full_chain'))
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', 'private', 'full_chain'))
