@@ -1,0 +1,16 @@
+inherit_from: .rubocop_todo.yml
+
+Metrics/LineLength:
+  Max: 200
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "bin/**/*"
+    - "spec/*"
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  Exclude:
+    - 'bin/console'

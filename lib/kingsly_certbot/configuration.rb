@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module KingslyCertbot
   class << self
     attr_accessor :configuration
   end
 
   def self.configure
-    self.configuration = self.configuration || Configuration.new
+    self.configuration = configuration || Configuration.new
     yield(configuration)
   end
 

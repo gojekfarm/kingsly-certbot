@@ -1,16 +1,18 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'tmpdir'
 
 RSpec.describe KingslyCertbot::IpSecCertAdapter do
   context 'integration test' do
-    let(:tld) {'example.com'}
-    let(:subdomain) {'www'}
-    let(:cert_bundle) {KingslyCertbot::CertBundle.new(
+    let(:tld) { 'example.com' }
+    let(:subdomain) { 'www' }
+    let(:cert_bundle) {
+      KingslyCertbot::CertBundle.new(
         tld,
         subdomain,
         "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
         "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
-    )}
+    ) }
 
     it 'should write the certs to file if no certs exist in the directory' do
       tmpdir = Dir.mktmpdir

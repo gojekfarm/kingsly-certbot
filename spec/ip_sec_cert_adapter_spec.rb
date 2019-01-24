@@ -1,5 +1,4 @@
 require 'spec_helper'
-include RSpec::Mocks::ExampleMethods
 
 RSpec.describe KingslyCertbot::IpSecCertAdapter do
   let(:time_str) {'20190121_172725'}
@@ -121,7 +120,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   end
 
   def expect_to_write_to_file(filepath, file_content)
-    file_double = File.instance_double('File')
+    file_double = double('File')
     expect(FileUtils).to receive(:mkdir_p).with(filepath[0...filepath.rindex('/')])
     expect(File).to receive(:open).with(filepath, 'w').and_yield(file_double)
     expect(file_double).to receive(:write).with(file_content)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 module KingslyCertbot
@@ -13,7 +15,7 @@ module KingslyCertbot
 
     def ==(other)
       return false if other.class != self.class
-      self.state == other.state
+      state == other.state
     end
 
     def hash

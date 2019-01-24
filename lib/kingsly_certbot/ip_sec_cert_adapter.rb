@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module KingslyCertbot
   class IpSecCertAdapter
 
@@ -46,7 +48,7 @@ module KingslyCertbot
     end
 
     def restart_service
-      result = %x[ipsec restart]
+      result = %x(ipsec restart)
       STDERR.puts "ipsec restart command failed with exitstatus: '#{result.exitstatus}'" unless result.success?
       result.success?
     rescue StandardError => e
