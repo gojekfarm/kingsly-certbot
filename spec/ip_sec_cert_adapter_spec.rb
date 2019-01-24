@@ -2,6 +2,8 @@ require 'spec_helper'
 include RSpec::Mocks::ExampleMethods
 
 RSpec.describe KingslyCertbot::IpSecCertAdapter do
+  let(:time_str) {'20190121_172725'}
+
   context 'guard clause' do
     it 'raises exception if passed parameter not of type CertBundle' do
       expect {KingslyCertbot::IpSecCertAdapter.new(nil)}.to raise_exception('passed parameter not of type CertBundle')
@@ -25,10 +27,11 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
 
 
     it 'should just create new cert files if old files do not exists' do
+      allow(Time).to receive_message_chain(:now, :strftime).and_return(time_str)
       expect(File).to receive(:exist?).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return(true)
       expect(File).to receive(:exist?).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return(false)
 
-      expect(FileUtils).to_not receive(:mkdir_p)
+      expect(FileUtils).to_not receive(:mkdir_p).with("/etc/ipsec.d/private/backup/#{time_str}")
       expect(FileUtils).to_not receive(:mv)
 
       expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
@@ -39,7 +42,6 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
     end
 
     context 'old cert files exists' do
-      let(:time_str) { '20190121_172725' }
       before(:each) do
         allow(Time).to receive_message_chain(:now, :strftime).and_return(time_str)
         expect(File).to receive(:exist?).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return(true)
@@ -120,6 +122,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
 
   def expect_to_write_to_file(filepath, file_content)
     file_double = File.instance_double('File')
+    expect(FileUtils).to receive(:mkdir_p).with(filepath[0...filepath.rindex('/')])
     expect(File).to receive(:open).with(filepath, 'w').and_yield(file_double)
     expect(file_double).to receive(:write).with(file_content)
   end

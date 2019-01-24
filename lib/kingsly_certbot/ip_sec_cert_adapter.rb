@@ -34,10 +34,12 @@ module KingslyCertbot
         end
       end
 
+      FileUtils.mkdir_p(cert_private_dir) unless Dir.exist?(cert_private_dir)
       File.open(private_key_filepath, 'w') do |f|
         f.write(@cert_bundle.private_key)
       end
 
+      FileUtils.mkdir_p(certs_dir) unless Dir.exist?(certs_dir)
       File.open(cert_filepath, 'w') do |f|
         f.write(@cert_bundle.full_chain)
       end
