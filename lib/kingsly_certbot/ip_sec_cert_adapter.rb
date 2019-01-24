@@ -1,19 +1,21 @@
 module KingslyCertbot
   class IpSecCertAdapter
 
-    CERT_BACKUP_DIR = '/etc/ipsec.d/backup'
-    CERT_PRIVATE_DIR = '/etc/ipsec.d/private'
-    CERTS_DIR = '/etc/ipsec.d/certs'
+    attr_reader :cert_backup_dir, :cert_private_dir, :certs_dir
 
-    def initialize(cert_bundle)
+    def initialize(cert_bundle, root = '/')
       raise 'passed parameter not of type CertBundle' if cert_bundle.class != KingslyCertbot::CertBundle
       @cert_bundle = cert_bundle
+      root = root.end_with?('/') ? root : "#{root}/"
+      @cert_backup_dir = "#{root}etc/ipsec.d/backup"
+      @cert_private_dir = "#{root}etc/ipsec.d/private"
+      @certs_dir = "#{root}etc/ipsec.d/certs"
     end
 
     def update_assets
       cert_filename = "#{@cert_bundle.subdomain}.#{@cert_bundle.tld}.pem"
-      private_key_filepath = "#{CERT_PRIVATE_DIR}/#{cert_filename}"
-      cert_filepath = "#{CERTS_DIR}/#{cert_filename}"
+      private_key_filepath = "#{cert_private_dir}/#{cert_filename}"
+      cert_filepath = "#{certs_dir}/#{cert_filename}"
 
       if File.exist?(private_key_filepath) && File.exist?(cert_filepath)
         existing_private_key_content = File.read(private_key_filepath)
@@ -23,7 +25,7 @@ module KingslyCertbot
           return
         else
           time = Time.now.strftime('%Y%m%d_%H%M%S')
-          backup_dir = "#{CERT_BACKUP_DIR}/#{time}"
+          backup_dir = "#{cert_backup_dir}/#{time}"
           STDOUT.puts "Taking backup of existing certificates to #{backup_dir}"
 
           FileUtils.mkdir_p(backup_dir)
