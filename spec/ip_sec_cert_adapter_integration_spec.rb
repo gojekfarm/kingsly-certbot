@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'tmpdir'
 
@@ -6,13 +7,12 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   context 'integration test' do
     let(:tld) { 'example.com' }
     let(:subdomain) { 'www' }
-    let(:cert_bundle) {
-      KingslyCertbot::CertBundle.new(
-        tld,
-        subdomain,
-        "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
-        "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
-    ) }
+    let(:cert_bundle) do
+      KingslyCertbot::CertBundle.new(tld,
+                                     subdomain,
+                                     "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
+                                     "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+    end
 
     it 'should write the certs to file if no certs exist in the directory' do
       tmpdir = Dir.mktmpdir
@@ -42,7 +42,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       expect(backup_dir_timestamp.size).to eq(1)
       backup_private_filepath = "#{backup_dir_timestamp[0]}/#{subdomain}.#{tld}.pem.private"
       backup_cert_filepath = "#{backup_dir_timestamp[0]}/#{subdomain}.#{tld}.pem.certs"
-      old_private_file_exists =  File.exist?(backup_private_filepath)
+      old_private_file_exists = File.exist?(backup_private_filepath)
       old_cert_file_exists = File.exist?(backup_cert_filepath)
 
       expect(old_private_file_exists).to eq(true)

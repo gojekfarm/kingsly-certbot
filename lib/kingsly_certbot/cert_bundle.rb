@@ -15,6 +15,7 @@ module KingslyCertbot
 
     def ==(other)
       return false if other.class != self.class
+
       state == other.state
     end
 

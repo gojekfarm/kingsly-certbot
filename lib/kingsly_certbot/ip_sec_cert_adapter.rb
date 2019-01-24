@@ -2,11 +2,11 @@
 
 module KingslyCertbot
   class IpSecCertAdapter
-
     attr_reader :cert_backup_dir, :cert_private_dir, :certs_dir
 
     def initialize(cert_bundle, root = '/')
       raise 'passed parameter not of type CertBundle' if cert_bundle.class != KingslyCertbot::CertBundle
+
       @cert_bundle = cert_bundle
       root = root.end_with?('/') ? root : "#{root}/"
       @cert_backup_dir = "#{root}etc/ipsec.d/backup"

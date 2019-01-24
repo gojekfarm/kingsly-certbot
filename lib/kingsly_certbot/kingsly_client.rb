@@ -29,10 +29,10 @@ module KingslyCertbot
       headers['Content-Type'] = 'application/json'
 
       begin
-        resp = http.start {|http_request|
+        resp = http.start do |http_request|
           http_request.post(uri.path, JSON.dump(body), headers)
-        }
-      rescue Exception => e
+        end
+      rescue StandardError => e
         raise e.message
       end
 

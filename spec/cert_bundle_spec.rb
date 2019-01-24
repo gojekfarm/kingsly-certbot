@@ -1,8 +1,8 @@
 require 'fileutils'
 
 RSpec.describe KingslyCertbot::CertBundle do
-  let(:private_key) {"-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n"}
-  let(:full_chain) {"-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"}
+  let(:private_key) { "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n" }
+  let(:full_chain) { "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n" }
   context '==' do
     it 'should match two object as equals if tld, subdomain, private and full_chain matches' do
       first = KingslyCertbot::CertBundle.new('example.com', 'www', private_key, full_chain)
@@ -23,13 +23,13 @@ RSpec.describe KingslyCertbot::CertBundle do
 
     it 'should return false if attribute is different is different' do
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', private_key, full_chain))
-          .to_not eq(KingslyCertbot::CertBundle.new('otherexample.com', 'www', private_key, full_chain))
+        .to_not eq(KingslyCertbot::CertBundle.new('otherexample.com', 'www', private_key, full_chain))
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', private_key, full_chain))
-          .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'www-diff', private_key, full_chain))
+        .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'www-diff', private_key, full_chain))
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', private_key, full_chain))
-          .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'diff', 'other-private', full_chain))
+        .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'diff', 'other-private', full_chain))
       expect(KingslyCertbot::CertBundle.new('example.com', 'www', private_key, full_chain))
-          .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'diff', private_key, 'other-full_chain'))
+        .to_not eq(KingslyCertbot::CertBundle.new('example.com', 'diff', private_key, 'other-full_chain'))
     end
   end
 end

@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe KingslyCertbot::IpSecCertAdapter do
-  let(:time_str) {'20190121_172725'}
+  let(:time_str) { '20190121_172725' }
 
   context 'guard clause' do
     it 'raises exception if passed parameter not of type CertBundle' do
-      expect {KingslyCertbot::IpSecCertAdapter.new(nil)}.to raise_exception('passed parameter not of type CertBundle')
-      expect {KingslyCertbot::IpSecCertAdapter.new(Object.new)}.to raise_exception('passed parameter not of type CertBundle')
+      expect { KingslyCertbot::IpSecCertAdapter.new(nil) }.to raise_exception('passed parameter not of type CertBundle')
+      expect { KingslyCertbot::IpSecCertAdapter.new(Object.new) }.to raise_exception('passed parameter not of type CertBundle')
     end
 
     it 'should not raise exception if valid parameter is passed' do
@@ -15,15 +15,16 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   end
 
   context 'write_cert_files' do
-    let(:tld) {'example.com'}
-    let(:subdomain) {'www'}
-    let(:cert_bundle) {KingslyCertbot::CertBundle.new(
+    let(:tld) { 'example.com' }
+    let(:subdomain) { 'www' }
+    let(:cert_bundle) do
+      KingslyCertbot::CertBundle.new(
         tld,
         subdomain,
         "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n",
         "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n"
-    )}
-
+      )
+    end
 
     it 'should just create new cert files if old files do not exists' do
       allow(Time).to receive_message_chain(:now, :strftime).and_return(time_str)
@@ -48,12 +49,18 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       end
 
       it 'should replace old files to backup folder named as current timestamp' do
-        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nDIFFERENT FOO...\n-----END RSA PRIVATE KEY-----\n")
-        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN RSA PRIVATE KEY-----\nDIFFERENT FOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
 
         expect(FileUtils).to receive(:mkdir_p).with('/etc/ipsec.d/backup/20190121_172725')
-        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.private", force: true)
-        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.certs", force: true)
+        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem",
+                                               "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.private",
+                                               force: true)
+        expect(FileUtils).to receive(:mv).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem",
+                                               "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.certs",
+                                               force: true)
 
         expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
 
@@ -65,16 +72,20 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       end
 
       it 'should not replace the existing cert file if the content is same for both fullchain and private key' do
-        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
-        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
         expect(STDOUT).to receive(:puts).with('New certificate file is same as old cert file, skipping updating certificates')
         adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
         adapter.update_assets
       end
 
       it 'should replace the existing cert file if the content is not same for fullchain but same for private key' do
-        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
-        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nDifferent cert...\n-----END CERTIFICATE-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN CERTIFICATE-----\nDifferent cert...\n-----END CERTIFICATE-----\n")
 
         expect(FileUtils).to receive(:mkdir_p).with("/etc/ipsec.d/backup/#{time_str}")
         expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
@@ -85,8 +96,10 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       end
 
       it 'should replace the existing private key if the content is not same for private key but same for fullchain' do
-        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem").and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA DIFFERENT PRIVATE KEY-----\n")
-        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem").and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA DIFFERENT PRIVATE KEY-----\n")
+        expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
+                                      .and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
         expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
         expect(FileUtils).to receive(:mkdir_p).with("/etc/ipsec.d/backup/#{time_str}")
         expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
