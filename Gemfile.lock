@@ -54,12 +54,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.0)
+  bundler (~> 2.0.1)
   kingsly_certbot!
-  rake (~> 10.0)
-  rspec (~> 3.0)
-  rubocop
-  webmock
+  rake (~> 10.5.0)
+  rspec (~> 3.8.0)
+  rubocop (~> 0.63.1)
+  webmock (~> 3.5.1)
 
 BUNDLED WITH
    2.0.1

@@ -3,15 +3,10 @@ Metrics/LineLength:
 
 Style/FrozenStringLiteralComment:
   Exclude:
-    - 'bin/*'
     - 'spec/*'
 
 Style/Documentation:
   Enabled: false
-
-Style/StringLiterals:
-  Exclude:
-    - 'bin/console'
 
 Style/CommandLiteral:
   Enabled: false
