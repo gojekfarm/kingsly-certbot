@@ -4,3 +4,6 @@
 require 'kingsly_certbot'
 
 puts "It Works #{KingslyCertbot::VERSION}"
+
+# kingsly-certbot --config /opt/kingsly-certbot/kingsly-certbot.conf
+KingslyCertbot::Runner.new(ARGV).execute
