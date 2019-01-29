@@ -43,7 +43,7 @@ RSpec.describe KingslyCertbot::Runner do
     )
       certbot = KingslyCertbot::Runner.new(['--config', conf_file])
       certbot.configure
-      expect(KingslyCertbot.configuration.sentry_dsn).to eq(sentry_dsn)
+      expect(certbot.configuration.sentry_dsn).to eq(sentry_dsn)
     end
 
     it 'should not configure sentry if sentry_dsn variable not provided' do
