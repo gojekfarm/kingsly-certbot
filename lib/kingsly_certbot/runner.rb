@@ -10,11 +10,23 @@ module KingslyCertbot
       @config_path = args[1]
     end
 
-    def configuration
-      sentry_dsn = YAML.load_file(@config_path)['SENTRY_DSN']
+    def configure
+      local_config = YAML.load_file(@config_path)
+      environment = local_config['ENVIRONMENT'] || 'development'
+      sentry_dsn = local_config['SENTRY_DSN']
       KingslyCertbot.configure do |config|
         config.sentry_dsn = sentry_dsn
       end
+
+      Raven.configure do |config|
+        config.dsn = KingslyCertbot.configuration.sentry_dsn
+        config.encoding = 'json'
+        config.environments = %w[production integration]
+        config.current_environment = environment
+        config.logger = Raven::Logger.new(STDOUT)
+        config.release = KingslyCertbot::VERSION
+      end
+      self
     rescue Psych::SyntaxError => e
       raise StandardError, "Invalid YAML config file '#{@config_path}', original message: '#{e.message}'"
     end

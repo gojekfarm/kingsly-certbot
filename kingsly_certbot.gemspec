@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.8.0'
   spec.add_development_dependency 'rubocop', '~> 0.63.1'
   spec.add_development_dependency 'webmock', '~> 3.5.1'
+  spec.add_runtime_dependency 'sentry-raven', '~> 2.9.0'
 end

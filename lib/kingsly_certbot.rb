@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'sentry-raven'
+
 require 'kingsly_certbot/version'
 require 'kingsly_certbot/configuration'
 require 'kingsly_certbot/cert_bundle'

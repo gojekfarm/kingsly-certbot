@@ -1,0 +1,5 @@
+#ENVIRONMENT: (production|integration|development) *mandatory, default: development
+ENVIRONMENT: development
+#SENTRY_DSN: (https://user:password@sentry.host/0) *optional
+SENTRY_DSN:
+

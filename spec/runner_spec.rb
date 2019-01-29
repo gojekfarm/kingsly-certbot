@@ -21,13 +21,18 @@ RSpec.describe KingslyCertbot::Runner do
     let(:tmp_dir) { Dir.mktmpdir }
     let(:conf_file) { "#{tmp_dir}/kingsly-certbot.conf" }
 
+    before(:each) do
+      Raven.instance.configuration = Raven::Configuration.new
+      Raven.instance.configuration.silence_ready = true
+    end
+
     it 'should load the config file from disk and raise an exception if config is invalid' do
       File.write(conf_file, <<~STR
         `invalid yaml file
       STR
     )
       certbot = KingslyCertbot::Runner.new(['--config', conf_file])
-      expect { certbot.configuration }.to raise_error(start_with("Invalid YAML config file '#{conf_file}'"))
+      expect { certbot.configure }.to raise_error(start_with("Invalid YAML config file '#{conf_file}'"))
     end
 
     it 'should load the config file from disk and set the configuration' do
@@ -37,8 +42,18 @@ RSpec.describe KingslyCertbot::Runner do
       STR
     )
       certbot = KingslyCertbot::Runner.new(['--config', conf_file])
-      certbot.configuration
+      certbot.configure
       expect(KingslyCertbot.configuration.sentry_dsn).to eq(sentry_dsn)
+    end
+
+    it 'should not configure sentry if sentry_dsn variable not provided' do
+      File.write(conf_file, <<~STR
+        ENVIRONMENT: development
+      STR
+    )
+      certbot = KingslyCertbot::Runner.new(['--config', conf_file])
+      certbot.configure
+      expect(Raven.configuration.server).to eq(nil)
     end
   end
 end
