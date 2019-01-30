@@ -8,6 +8,7 @@ RSpec.describe KingslyCertbot do
   let(:host) { 'certbot.com' }
   let(:user) { 'user' }
   let(:password) { 'password' }
+  let(:server_type) { 'ipsec' }
 
   context 'initialize' do
     it 'should set properties from passed params' do
@@ -18,7 +19,8 @@ RSpec.describe KingslyCertbot do
         'SUB_DOMAIN' => sub_domain,
         'KINGSLY_SERVER_HOST' => host,
         'KINGSLY_SERVER_USER' => user,
-        'KINGSLY_SERVER_PASSWORD' => password
+        'KINGSLY_SERVER_PASSWORD' => password,
+        'SERVER_TYPE' => server_type
       )
       expect(configuration.sentry_dsn).to eq(sentry_dsn)
       expect(configuration.environment).to eq(environment)
@@ -27,6 +29,7 @@ RSpec.describe KingslyCertbot do
       expect(configuration.kingsly_server_host).to eq(host)
       expect(configuration.kingsly_server_user).to eq(user)
       expect(configuration.kingsly_server_password).to eq(password)
+      expect(configuration.server_type).to eq(server_type)
     end
   end
 
@@ -39,7 +42,8 @@ RSpec.describe KingslyCertbot do
         'SUB_DOMAIN' => sub_domain,
         'KINGSLY_SERVER_HOST' => host,
         'KINGSLY_SERVER_USER' => user,
-        'KINGSLY_SERVER_PASSWORD' => password
+        'KINGSLY_SERVER_PASSWORD' => password,
+        'SERVER_TYPE' => server_type
       }
     end
 
@@ -53,6 +57,12 @@ RSpec.describe KingslyCertbot do
     it 'should return config if valid' do
       config = KingslyCertbot::Configuration.new(valid_config)
       expect(config.validate!).to eq(config)
+    end
+
+    it 'should raise exception if server_type is not supported' do
+      valid_config['SERVER_TYPE'] = 'invalid'
+      config = KingslyCertbot::Configuration.new(valid_config)
+      expect { config.validate! }.to raise_exception("Unsupported server_type 'invalid'")
     end
   end
 end

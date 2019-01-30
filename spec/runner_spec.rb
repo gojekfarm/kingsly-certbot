@@ -62,6 +62,9 @@ RSpec.describe KingslyCertbot::Runner do
     let(:conf_file) { "#{tmp_dir}/kingsly-certbot.conf" }
 
     before(:each) do
+      Raven.instance.configuration = Raven::Configuration.new
+      Raven.instance.configuration.silence_ready = true
+      allow_any_instance_of(Logger).to receive(:warn)
       File.write(conf_file, <<~STR
         SENTRY_DSN: http://foo:bar@example.com/42
         ENVIRONMENT: test
@@ -70,14 +73,32 @@ RSpec.describe KingslyCertbot::Runner do
         KINGSLY_SERVER_HOST: kingsly-test.com
         KINGSLY_SERVER_USER: user
         KINGSLY_SERVER_PASSWORD: password
+        SERVER_TYPE: ipsec
       STR
     )
     end
 
-    it 'should catch failure and log to raven' do
+    it 'should catch configuration validate failure and log to raven' do
+      error = StandardError.new('validation error in configuration')
+      expect_any_instance_of(KingslyCertbot::Configuration).to receive(:validate!).and_raise(error)
+      expect(Raven).to receive(:capture_exception).with(error, 'Failed in KingslyCertbot::Runner.execute operation')
+      KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
+    end
+
+    it 'should catch KingslyClient failure and log to raven' do
       error = StandardError.new('some error while fetching certificate')
       expect(KingslyCertbot::KingslyClient).to receive(:get_cert_bundle).and_raise(error)
       expect(Raven).to receive(:capture_exception).with(error, 'Failed in KingslyCertbot::Runner.execute operation')
+      KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
+    end
+
+    it 'should initialize ipsec adapter and update_assets + restart service' do
+      cert_bundle = double('')
+      adapter = double('ipsec_adapter')
+      allow(KingslyCertbot::KingslyClient).to receive(:get_cert_bundle).and_return(cert_bundle)
+      expect(KingslyCertbot::IpSecCertAdapter).to receive(:new).with(cert_bundle, '/').and_return(adapter)
+      expect(adapter).to receive(:update_assets).once
+      expect(adapter).to receive(:restart_service).once
       KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
     end
   end

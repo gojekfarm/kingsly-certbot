@@ -29,12 +29,8 @@ module KingslyCertbot
       headers['Authorization'] = 'Basic ' + Base64.encode64("#{kingsly_server_user}:#{kingsly_server_password}").chop
       headers['Content-Type'] = 'application/json'
 
-      begin
-        resp = http.start do |http_request|
-          http_request.post(uri.path, JSON.dump(body), headers)
-        end
-      rescue StandardError => e
-        raise e.message
+      resp = http.start do |http_request|
+        http_request.post(uri.path, JSON.dump(body), headers)
       end
 
       raise 'Authentication failure with kingsly, Please check your authentication configuration' if resp.code == '401'
