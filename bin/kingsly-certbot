@@ -4,4 +4,4 @@
 require 'kingsly_certbot'
 
 # kingsly-certbot --config /opt/kingsly-certbot/kingsly-certbot.conf
-KingslyCertbot::Runner.new(ARGV).configure
+KingslyCertbot::Runner.new(ARGV).configure.execute

@@ -28,7 +28,6 @@ module KingslyCertbot
       headers = {}
       headers['Authorization'] = 'Basic ' + Base64.encode64("#{kingsly_server_user}:#{kingsly_server_password}").chop
       headers['Content-Type'] = 'application/json'
-
       resp = http.start do |http_request|
         http_request.post(uri.path, JSON.dump(body), headers)
       end

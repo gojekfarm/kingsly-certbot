@@ -26,5 +26,16 @@ module KingslyCertbot
 
       self
     end
+
+    def to_s
+      str = ''
+      [:kingsly_server_host, :kingsly_server_user, :kingsly_server_password, :top_level_domain, :sub_domain,
+       :kingsly_http_read_timeout, :kingsly_http_open_timeout, :sentry_dsn, :environment, :server_type].each do |key|
+        value = self.send(key)
+        value = "****" if key == :kingsly_server_password
+        str+="#{key.to_s}: '#{value}'\n"
+      end
+      str
+    end
   end
 end

@@ -1,5 +1,8 @@
-#ENVIRONMENT: (production|integration|development) *mandatory, default: development
-ENVIRONMENT: development
-#SENTRY_DSN: (https://user:password@sentry.host/0) *optional
 SENTRY_DSN:
-
+ENVIRONMENT: 'development'
+TOP_LEVEL_DOMAIN: 'go-life.co.id'
+SUB_DOMAIN: 'delete-thirty-one'
+KINGSLY_SERVER_HOST: 'integration-kingsly.golabs.io'
+KINGSLY_SERVER_USER: 'iB61GxUvK8CI'
+KINGSLY_SERVER_PASSWORD: 'xstrvhfbAAhk0BDNqRd51qvzc9ZF7'
+SERVER_TYPE: 'ipsec'
