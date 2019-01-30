@@ -2,7 +2,7 @@
 
 module KingslyCertbot
   class Configuration
-    attr_accessor :kingsly_host, :kingsly_user, :kingsly_password, :top_level_domain, :sub_domain,
+    attr_accessor :kingsly_server_host, :kingsly_server_user, :kingsly_server_password, :top_level_domain, :sub_domain,
                   :kingsly_http_read_timeout, :kingsly_http_open_timeout, :sentry_dsn, :environment
 
     def initialize(params = {})
@@ -12,9 +12,16 @@ module KingslyCertbot
       @environment = params['ENVIRONMENT'] || 'development'
       @top_level_domain = params['TOP_LEVEL_DOMAIN']
       @sub_domain = params['SUB_DOMAIN']
-      @kingsly_host = params['KINGSLY_SERVER_HOST']
-      @kingsly_user = params['KINGSLY_SERVER_USER']
-      @kingsly_password = params['KINGSLY_SERVER_PASSWORD']
+      @kingsly_server_host = params['KINGSLY_SERVER_HOST']
+      @kingsly_server_user = params['KINGSLY_SERVER_USER']
+      @kingsly_server_password = params['KINGSLY_SERVER_PASSWORD']
+    end
+
+    def validate!
+      %i[top_level_domain sub_domain kingsly_server_host kingsly_server_user kingsly_server_password].each do |mandatory|
+        raise "Missing mandatory config '#{mandatory}'" if send(mandatory).nil? || send(mandatory) == ''
+      end
+      self
     end
   end
 end

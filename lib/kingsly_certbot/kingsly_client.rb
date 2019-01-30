@@ -6,9 +6,9 @@ require 'base64'
 
 module KingslyCertbot
   class KingslyClient
-    def self.get_cert_bundle(kingsly_host:,
-                             kingsly_user:,
-                             kingsly_password:,
+    def self.get_cert_bundle(kingsly_server_host:,
+                             kingsly_server_user:,
+                             kingsly_server_password:,
                              top_level_domain:,
                              sub_domain:,
                              kingsly_http_read_timeout: 120,
@@ -18,7 +18,7 @@ module KingslyCertbot
         'top_level_domain' => top_level_domain,
         'sub_domain' => sub_domain
       }
-      uri = URI.parse("http://#{kingsly_host}/v1/cert_bundles")
+      uri = URI.parse("http://#{kingsly_server_host}/v1/cert_bundles")
 
       http = Net::HTTP.new(uri.host, '80')
 
@@ -26,7 +26,7 @@ module KingslyCertbot
       http.open_timeout = kingsly_http_open_timeout
 
       headers = {}
-      headers['Authorization'] = 'Basic ' + Base64.encode64("#{kingsly_user}:#{kingsly_password}").chop
+      headers['Authorization'] = 'Basic ' + Base64.encode64("#{kingsly_server_user}:#{kingsly_server_password}").chop
       headers['Content-Type'] = 'application/json'
 
       begin

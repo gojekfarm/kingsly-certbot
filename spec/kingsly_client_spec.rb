@@ -5,12 +5,12 @@ RSpec.describe KingslyCertbot::KingslyClient do
   let(:sub_domain) { 'sample-integration-cert' }
   let(:private_key) { "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n" }
   let(:full_chain) { "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n" }
-  let(:kingsly_host) { 'kingsly.something.com' }
-  let(:kingsly_user) { 'user' }
-  let(:kingsly_password) { 'pass' }
+  let(:kingsly_server_host) { 'kingsly.something.com' }
+  let(:kingsly_server_user) { 'user' }
+  let(:kingsly_server_password) { 'pass' }
 
   it 'kingsly client should return cert bundle' do
-    stub_request(:post, "http://#{kingsly_host}/v1/cert_bundles")
+    stub_request(:post, "http://#{kingsly_server_host}/v1/cert_bundles")
       .with(
         body: %({"top_level_domain":"#{top_level_domain}","sub_domain":"#{sub_domain}"}),
         headers: {
@@ -27,9 +27,9 @@ RSpec.describe KingslyCertbot::KingslyClient do
         headers: {}
       )
 
-    cert_bundle = KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_host: kingsly_host,
-                                                                kingsly_user: kingsly_user,
-                                                                kingsly_password: kingsly_password,
+    cert_bundle = KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
+                                                                kingsly_server_user: kingsly_server_user,
+                                                                kingsly_server_password: kingsly_server_password,
                                                                 top_level_domain: top_level_domain,
                                                                 sub_domain: sub_domain)
 
@@ -53,9 +53,9 @@ RSpec.describe KingslyCertbot::KingslyClient do
       .to_return(status: 401, body: '', headers: {})
 
     expect do
-      KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_host: kingsly_host,
-                                                    kingsly_user: kingsly_user,
-                                                    kingsly_password: kingsly_password,
+      KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
+                                                    kingsly_server_user: kingsly_server_user,
+                                                    kingsly_server_password: kingsly_server_password,
                                                     top_level_domain: top_level_domain,
                                                     sub_domain: sub_domain)
     end
@@ -67,9 +67,9 @@ RSpec.describe KingslyCertbot::KingslyClient do
     stub_request(:post, 'http://kingsly.something.com/v1/cert_bundles').to_timeout
 
     expect do
-      KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_host: kingsly_host,
-                                                    kingsly_user: kingsly_user,
-                                                    kingsly_password: kingsly_password,
+      KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
+                                                    kingsly_server_user: kingsly_server_user,
+                                                    kingsly_server_password: kingsly_server_password,
                                                     top_level_domain: top_level_domain,
                                                     sub_domain: sub_domain)
     end

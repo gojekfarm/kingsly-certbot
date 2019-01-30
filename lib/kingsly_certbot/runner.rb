@@ -32,10 +32,11 @@ module KingslyCertbot
     end
 
     def execute
+      @configuration.validate!
       KingslyClient.get_cert_bundle(
-        kingsly_host: @configuration.kingsly_host,
-        kingsly_user: @configuration.kingsly_user,
-        kingsly_password: @configuration.kingsly_password,
+        kingsly_server_host: @configuration.kingsly_server_host,
+        kingsly_server_user: @configuration.kingsly_server_user,
+        kingsly_server_password: @configuration.kingsly_server_password,
         top_level_domain: @configuration.top_level_domain,
         sub_domain: @configuration.sub_domain,
         kingsly_http_read_timeout: @configuration.kingsly_http_read_timeout,
