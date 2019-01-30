@@ -43,7 +43,7 @@ RSpec.describe KingslyCertbot::Runner do
     )
       certbot = KingslyCertbot::Runner.new(['--config', conf_file])
       certbot.configure
-      expect(KingslyCertbot.configuration.sentry_dsn).to eq(sentry_dsn)
+      expect(certbot.configuration.sentry_dsn).to eq(sentry_dsn)
     end
 
     it 'should not configure sentry if sentry_dsn variable not provided' do
@@ -54,6 +54,31 @@ RSpec.describe KingslyCertbot::Runner do
       certbot = KingslyCertbot::Runner.new(['--config', conf_file])
       certbot.configure
       expect(Raven.configuration.server).to eq(nil)
+    end
+  end
+
+  context 'execute' do
+    let(:tmp_dir) { Dir.mktmpdir }
+    let(:conf_file) { "#{tmp_dir}/kingsly-certbot.conf" }
+
+    before(:each) do
+      File.write(conf_file, <<~STR
+        SENTRY_DSN: http://foo:bar@example.com/42
+        ENVIRONMENT: test
+        TOP_LEVEL_DOMAIN: example.com
+        SUB_DOMAIN: www
+        KINGSLY_SERVER_HOST: kingsly-test.com
+        KINGSLY_SERVER_USER: user
+        KINGSLY_SERVER_PASSWORD: password
+      STR
+    )
+    end
+
+    it 'should catch failure and log to raven' do
+      error = StandardError.new('some error while fetching certificate')
+      expect(KingslyCertbot::KingslyClient).to receive(:get_cert_bundle).and_raise(error)
+      expect(Raven).to receive(:capture_exception).with(error, 'Failed in KingslyCertbot::Runner.execute operation')
+      KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
     end
   end
 end

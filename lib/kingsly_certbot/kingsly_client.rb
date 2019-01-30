@@ -6,12 +6,13 @@ require 'base64'
 
 module KingslyCertbot
   class KingslyClient
-    def self.get_cert_bundle(top_level_domain, sub_domain)
-      kingsly_host     = KingslyCertbot.configuration.kingsly_host
-      kingsly_user     = KingslyCertbot.configuration.kingsly_user
-      kingsly_password = KingslyCertbot.configuration.kingsly_password
-      kingsly_http_read_timeout = KingslyCertbot.configuration.kingsly_http_read_timeout
-      kingsly_http_open_timeout = KingslyCertbot.configuration.kingsly_http_open_timeout
+    def self.get_cert_bundle(kingsly_host:,
+                             kingsly_user:,
+                             kingsly_password:,
+                             top_level_domain:,
+                             sub_domain:,
+                             kingsly_http_read_timeout: 120,
+                             kingsly_http_open_timeout: 5)
 
       body = {
         'top_level_domain' => top_level_domain,

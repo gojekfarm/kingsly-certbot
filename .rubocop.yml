@@ -26,3 +26,7 @@ Metrics/CyclomaticComplexity:
 
 Metrics/AbcSize:
   Max: 36
+
+Metrics/ParameterLists:
+  Exclude:
+    - 'lib/kingsly_certbot/kingsly_client.rb'
