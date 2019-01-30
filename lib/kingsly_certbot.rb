@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'sentry-raven'
+require 'yaml'
+require 'psych'
 
 require 'kingsly_certbot/version'
 require 'kingsly_certbot/configuration'

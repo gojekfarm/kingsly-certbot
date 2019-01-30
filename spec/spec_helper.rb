@@ -12,4 +12,13 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.before(:each) do
+    $logger = double('logger')
+    allow($logger).to receive(:debug)
+    allow($logger).to receive(:info)
+    allow($logger).to receive(:warn)
+    allow($logger).to receive(:error)
+    allow($logger).to receive(:fatal)
+  end
 end

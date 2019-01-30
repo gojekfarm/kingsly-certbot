@@ -23,12 +23,12 @@ module KingslyCertbot
         existing_private_key_content = File.read(private_key_filepath)
         existing_cert_content = File.read(cert_filepath)
         if existing_private_key_content == @cert_bundle.private_key && existing_cert_content == @cert_bundle.full_chain
-          STDOUT.puts 'New certificate file is same as old cert file, skipping updating certificates'
+          $logger.info('New certificate file is same as old cert file, skipping updating certificates')
           return
         else
           time = Time.now.strftime('%Y%m%d_%H%M%S')
           backup_dir = "#{cert_backup_dir}/#{time}"
-          STDOUT.puts "Taking backup of existing certificates to #{backup_dir}"
+          $logger.info("Taking backup of existing certificates to #{backup_dir}")
 
           FileUtils.mkdir_p(backup_dir)
           FileUtils.mv(private_key_filepath, "#{backup_dir}/#{cert_filename}.private", force: true)
@@ -49,11 +49,11 @@ module KingslyCertbot
 
     def restart_service
       result = %x(ipsec restart)
-      STDERR.puts "ipsec restart command failed with exitstatus: '#{result.exitstatus}'" unless result.success?
+      $logger.error("ipsec restart command failed with exitstatus: '#{result.exitstatus}'") unless result.success?
       result.success?
     rescue StandardError => e
-      STDERR.puts "ipsec restart command failed with error message: '#{e.message}'"
-      false
+      $logger.fatal("ipsec restart command failed with error message: '#{e.message}'")
+      raise e
     end
   end
 end

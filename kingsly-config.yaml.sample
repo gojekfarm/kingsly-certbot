@@ -1,5 +1,9 @@
-#ENVIRONMENT: (production|integration|development) *mandatory, default: development
-ENVIRONMENT: development
-#SENTRY_DSN: (https://user:password@sentry.host/0) *optional
 SENTRY_DSN:
-
+ENVIRONMENT: 'development'
+TOP_LEVEL_DOMAIN: 'example.com'
+SUB_DOMAIN: 'subdomain'
+KINGSLY_SERVER_HOST: 'kingsly.example.com'
+KINGSLY_SERVER_USER: '****'
+KINGSLY_SERVER_PASSWORD: '****'
+SERVER_TYPE: 'ipsec'
+IPSEC_ROOT: ~/ipsec

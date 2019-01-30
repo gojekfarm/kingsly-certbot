@@ -9,6 +9,7 @@ RSpec.describe KingslyCertbot do
   let(:user) { 'user' }
   let(:password) { 'password' }
   let(:server_type) { 'ipsec' }
+  let(:ipsec_root) { '/tmp' }
 
   context 'initialize' do
     it 'should set properties from passed params' do
@@ -20,7 +21,8 @@ RSpec.describe KingslyCertbot do
         'KINGSLY_SERVER_HOST' => host,
         'KINGSLY_SERVER_USER' => user,
         'KINGSLY_SERVER_PASSWORD' => password,
-        'SERVER_TYPE' => server_type
+        'SERVER_TYPE' => server_type,
+        'IPSEC_ROOT' => ipsec_root,
       )
       expect(configuration.sentry_dsn).to eq(sentry_dsn)
       expect(configuration.environment).to eq(environment)
@@ -30,6 +32,7 @@ RSpec.describe KingslyCertbot do
       expect(configuration.kingsly_server_user).to eq(user)
       expect(configuration.kingsly_server_password).to eq(password)
       expect(configuration.server_type).to eq(server_type)
+      expect(configuration.ipsec_root).to eq(ipsec_root)
     end
   end
 

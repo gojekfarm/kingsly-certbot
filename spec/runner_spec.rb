@@ -7,6 +7,7 @@ RSpec.describe KingslyCertbot::Runner do
     it 'should raise exception if the config parameter is invalid' do
       expect { KingslyCertbot::Runner.new(nil) }.to raise_exception('Argument passed is not of type Array')
       expect { KingslyCertbot::Runner.new('') }.to raise_exception('Argument passed is not of type Array')
+      expect { KingslyCertbot::Runner.new(['']) }.to raise_exception('--config argument missing')
       expect { KingslyCertbot::Runner.new('foo') }.to raise_error(RuntimeError, 'Argument passed is not of type Array')
       expect { KingslyCertbot::Runner.new(['--foo', 'bar']) }.to raise_error("Unknown argument '--foo'")
     end

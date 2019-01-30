@@ -62,7 +62,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
                                                "/etc/ipsec.d/backup/20190121_172725/#{subdomain}.#{tld}.pem.certs",
                                                force: true)
 
-        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+        expect($logger).to receive(:info).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
 
         expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
         expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
@@ -76,7 +76,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
                                       .and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n")
         expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
                                       .and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
-        expect(STDOUT).to receive(:puts).with('New certificate file is same as old cert file, skipping updating certificates')
+        expect($logger).to receive(:info).with('New certificate file is same as old cert file, skipping updating certificates')
         adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
         adapter.update_assets
       end
@@ -88,7 +88,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
                                       .and_return("-----BEGIN CERTIFICATE-----\nDifferent cert...\n-----END CERTIFICATE-----\n")
 
         expect(FileUtils).to receive(:mkdir_p).with("/etc/ipsec.d/backup/#{time_str}")
-        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+        expect($logger).to receive(:info).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
         expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
         expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
         adapter = KingslyCertbot::IpSecCertAdapter.new(cert_bundle)
@@ -100,7 +100,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
                                       .and_return("-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA DIFFERENT PRIVATE KEY-----\n")
         expect(File).to receive(:read).with("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem")
                                       .and_return("-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n")
-        expect(STDOUT).to receive(:puts).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
+        expect($logger).to receive(:info).with('Taking backup of existing certificates to /etc/ipsec.d/backup/20190121_172725')
         expect(FileUtils).to receive(:mkdir_p).with("/etc/ipsec.d/backup/#{time_str}")
         expect_to_write_to_file("/etc/ipsec.d/private/#{subdomain}.#{tld}.pem", cert_bundle.private_key)
         expect_to_write_to_file("/etc/ipsec.d/certs/#{subdomain}.#{tld}.pem", cert_bundle.full_chain)
@@ -120,15 +120,16 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
     it 'should return false and print error to standard error if restart_service returns false' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
       expect(adapter).to receive(:`).with('ipsec restart').and_return(double('process status', success?: false, exitstatus: 127))
-      expect(STDERR).to receive(:puts).with("ipsec restart command failed with exitstatus: '127'")
+      expect($logger).to receive(:error).with("ipsec restart command failed with exitstatus: '127'")
       expect(adapter.restart_service).to eq(false)
     end
 
     it 'should return false and print error to standard error if command throws exception' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      expect(adapter).to receive(:`).with('ipsec restart').and_raise(StandardError.new('failed to find command ipsec'))
-      expect(STDERR).to receive(:puts).with("ipsec restart command failed with error message: 'failed to find command ipsec'")
-      expect(adapter.restart_service).to eq(false)
+      error = StandardError.new('failed to find command ipsec')
+      expect(adapter).to receive(:`).with('ipsec restart').and_raise(error)
+      expect($logger).to receive(:fatal).with("ipsec restart command failed with error message: 'failed to find command ipsec'")
+      expect{adapter.restart_service}.to raise_exception(error)
     end
   end
 

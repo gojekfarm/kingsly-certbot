@@ -6,6 +6,7 @@ module KingslyCertbot
 
     def initialize(args)
       raise 'Argument passed is not of type Array' if args.class != Array
+      raise '--config argument missing' if args[0] == nil || args[0].strip == ''
       raise "Unknown argument '#{args[0]}'" if args[0] != '--config'
       raise "Config file does not exist at '#{args[1]}'" unless File.exist?(args[1])
 
@@ -15,18 +16,19 @@ module KingslyCertbot
     def configure
       begin
         local_config = YAML.load_file(@config_path)
+        $logger.info("Loaded config file from #{@config_path}")
       rescue Psych::SyntaxError => e
         raise StandardError, "Invalid YAML config file '#{@config_path}', original message: '#{e.message}'"
       end
 
       @configuration = KingslyCertbot::Configuration.new(local_config)
-      @logger = Logger.new(STDOUT)
+      $logger.info("Loaded configuration: #{@configuration.to_s}")
       Raven.configure do |config|
         config.dsn = @configuration.sentry_dsn
         config.encoding = 'json'
         config.environments = %w[production integration]
         config.current_environment = @configuration.environment
-        config.logger = @logger
+        config.logger = $logger
         config.release = KingslyCertbot::VERSION
       end
       self
@@ -34,6 +36,7 @@ module KingslyCertbot
 
     def execute
       @configuration.validate!
+      $logger.info("Querying Kingsly server for certificate to domain #{@configuration.sub_domain}.#{@configuration.top_level_domain}")
       cert_bundle = KingslyClient.get_cert_bundle(
         kingsly_server_host: @configuration.kingsly_server_host,
         kingsly_server_user: @configuration.kingsly_server_user,
@@ -43,17 +46,20 @@ module KingslyCertbot
         kingsly_http_read_timeout: @configuration.kingsly_http_read_timeout,
         kingsly_http_open_timeout: @configuration.kingsly_http_open_timeout
       )
+      $logger.info("Updating assets for server type #{@configuration.server_type}")
       adapter = case @configuration.server_type
                 when 'ipsec'
-                  IpSecCertAdapter.new(cert_bundle, '/')
+                  IpSecCertAdapter.new(cert_bundle, @configuration.ipsec_root)
                 else
                   raise "Unsupported server type #{@configuration.server_type}"
                 end
       adapter.update_assets
       adapter.restart_service
+      $logger.info("Updated assets for server type #{@configuration.server_type}")
     rescue StandardError => e
-      @logger.warn('FAILED - Kingsly Certbot execution failed for following reason:')
-      @logger.warn(e.message)
+      $logger.error('FAILED - Kingsly Certbot execution failed for following reason:')
+      $logger.error(e.message)
+      $logger.error e.backtrace.join("\n")
       Raven.capture_exception(e, 'Failed in KingslyCertbot::Runner.execute operation')
     end
   end
