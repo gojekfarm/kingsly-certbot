@@ -5,7 +5,7 @@ require 'kingsly_certbot'
 
 # kingsly-certbot --config /opt/kingsly-certbot/kingsly-certbot.conf
 log_dir = ENV['LOG_DIR'] || '/var/log'
-$logger = if Dir.exists?(log_dir)
+$logger = if Dir.exist?(log_dir)
             file = File.open("#{log_dir}/kingsly-certbot.log", 'a')
             Logger.new(file, level: ENV['LOG_LEVEL'] || 'info')
           else
@@ -13,10 +13,10 @@ $logger = if Dir.exists?(log_dir)
           end
 certbot = begin
   KingslyCertbot::Runner.new(ARGV)
-rescue StandardError => e
-  $logger.fatal(e)
-  $logger.fatal(e.backtrace.join("\n"))
-  return 1
+          rescue StandardError => e
+            $logger.fatal(e)
+            $logger.fatal(e.backtrace.join("\n"))
+            return 1
 end
 
 certbot.configure.execute

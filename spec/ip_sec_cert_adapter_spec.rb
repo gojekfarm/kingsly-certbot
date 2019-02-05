@@ -129,7 +129,7 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
       error = StandardError.new('failed to find command ipsec')
       expect(adapter).to receive(:`).with('ipsec restart').and_raise(error)
       expect($logger).to receive(:fatal).with("ipsec restart command failed with error message: 'failed to find command ipsec'")
-      expect{adapter.restart_service}.to raise_exception(error)
+      expect { adapter.restart_service }.to raise_exception(error)
     end
   end
 

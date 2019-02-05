@@ -22,7 +22,7 @@ RSpec.describe KingslyCertbot do
         'KINGSLY_SERVER_USER' => user,
         'KINGSLY_SERVER_PASSWORD' => password,
         'SERVER_TYPE' => server_type,
-        'IPSEC_ROOT' => ipsec_root,
+        'IPSEC_ROOT' => ipsec_root
       )
       expect(configuration.sentry_dsn).to eq(sentry_dsn)
       expect(configuration.environment).to eq(environment)

@@ -14,6 +14,7 @@ Style/CommandLiteral:
 Metrics/BlockLength:
   Exclude:
     - 'spec/*'
+    - 'kingsly_certbot.gemspec'
 
 Metrics/PerceivedComplexity:
   Max: 8
@@ -30,3 +31,7 @@ Metrics/AbcSize:
 Metrics/ParameterLists:
   Exclude:
     - 'lib/kingsly_certbot/kingsly_client.rb'
+
+Style/GlobalVars:
+  AllowedVariables:
+    - '$logger'

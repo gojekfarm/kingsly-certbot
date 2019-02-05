@@ -6,7 +6,7 @@ module KingslyCertbot
 
     def initialize(args)
       raise 'Argument passed is not of type Array' if args.class != Array
-      raise '--config argument missing' if args[0] == nil || args[0].strip == ''
+      raise '--config argument missing' if args[0].nil? || args[0].strip == ''
       raise "Unknown argument '#{args[0]}'" if args[0] != '--config'
       raise "Config file does not exist at '#{args[1]}'" unless File.exist?(args[1])
 
@@ -22,7 +22,7 @@ module KingslyCertbot
       end
 
       @configuration = KingslyCertbot::Configuration.new(local_config)
-      $logger.info("Loaded configuration: #{@configuration.to_s}")
+      $logger.info("Loaded configuration: #{@configuration}")
       Raven.configure do |config|
         config.dsn = @configuration.sentry_dsn
         config.encoding = 'json'
