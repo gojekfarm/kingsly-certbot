@@ -18,7 +18,7 @@ module KingslyCertbot
         'top_level_domain' => top_level_domain,
         'sub_domain' => sub_domain
       }
-      uri = URI.parse("http://#{kingsly_server_host}/v1/cert_bundles")
+      uri = URI.parse("https://#{kingsly_server_host}/v1/cert_bundles")
 
       http = Net::HTTP.new(uri.host, '80')
 
