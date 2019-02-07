@@ -10,7 +10,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
   let(:kingsly_server_password) { 'pass' }
 
   it 'kingsly client should return cert bundle' do
-    stub_request(:post, "http://#{kingsly_server_host}/v1/cert_bundles")
+    stub_request(:post, "https://#{kingsly_server_host}/v1/cert_bundles")
       .with(
         body: %({"top_level_domain":"#{top_level_domain}","sub_domain":"#{sub_domain}"}),
         headers: {
@@ -39,7 +39,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
   end
 
   it 'returns exception if the authorisation headers are not valid' do
-    stub_request(:post, 'http://kingsly.something.com/v1/cert_bundles')
+    stub_request(:post, 'https://kingsly.something.com/v1/cert_bundles')
       .with(
         body: %({"top_level_domain":"#{top_level_domain}","sub_domain":"#{sub_domain}"}),
         headers: {
@@ -64,7 +64,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
   end
 
   it 'raises timeout exception when the http_read_timeout exceeds' do
-    stub_request(:post, 'http://kingsly.something.com/v1/cert_bundles').to_timeout
+    stub_request(:post, 'https://kingsly.something.com/v1/cert_bundles').to_timeout
 
     expect do
       KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
