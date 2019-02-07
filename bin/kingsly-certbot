@@ -4,13 +4,7 @@
 require 'kingsly_certbot'
 
 # kingsly-certbot --config /opt/kingsly-certbot/kingsly-certbot.conf
-log_dir = ENV['LOG_DIR'] || '/var/log'
-$logger = if Dir.exist?(log_dir)
-            file = File.open("#{log_dir}/kingsly-certbot.log", 'a')
-            Logger.new(file, level: ENV['LOG_LEVEL'] || 'info')
-          else
-            Logger.new(STDOUT)
-          end
+$logger = Logger.new(STDOUT)
 certbot = begin
   KingslyCertbot::Runner.new(ARGV)
           rescue StandardError => e
