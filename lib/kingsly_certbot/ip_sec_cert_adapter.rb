@@ -48,12 +48,9 @@ module KingslyCertbot
     end
 
     def restart_service
-      result = %x(ipsec restart)
-      $logger.error("ipsec restart command failed with exitstatus: '#{result.exitstatus}'") unless result.success?
-      result.success?
-    rescue StandardError => e
-      $logger.fatal("ipsec restart command failed with error message: '#{e.message}'")
-      raise e
+      result = Kernel.system('ipsec restart')
+      $logger.error('ipsec restart command failed') unless result
+      result
     end
   end
 end

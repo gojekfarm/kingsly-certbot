@@ -113,23 +113,14 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   context 'restart_service' do
     it 'should call ipsec restart and return true if success' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      expect(adapter).to receive(:`).with('ipsec restart').and_return(double('process status', success?: true))
+      allow(Kernel).to receive(:system).with('ipsec restart').and_return(true)
       expect(adapter.restart_service).to eq(true)
     end
 
     it 'should return false and print error to standard error if restart_service returns false' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      expect(adapter).to receive(:`).with('ipsec restart').and_return(double('process status', success?: false, exitstatus: 127))
-      expect($logger).to receive(:error).with("ipsec restart command failed with exitstatus: '127'")
+      allow(Kernel).to receive(:system).with('ipsec restart').and_return(false)
       expect(adapter.restart_service).to eq(false)
-    end
-
-    it 'should return false and print error to standard error if command throws exception' do
-      adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      error = StandardError.new('failed to find command ipsec')
-      expect(adapter).to receive(:`).with('ipsec restart').and_raise(error)
-      expect($logger).to receive(:fatal).with("ipsec restart command failed with error message: 'failed to find command ipsec'")
-      expect { adapter.restart_service }.to raise_exception(error)
     end
   end
 
