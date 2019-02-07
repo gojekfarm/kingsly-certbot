@@ -20,7 +20,8 @@ module KingslyCertbot
       }
       uri = URI.parse("https://#{kingsly_server_host}/v1/cert_bundles")
 
-      http = Net::HTTP.new(uri.host, '80')
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
 
       http.read_timeout = kingsly_http_read_timeout
       http.open_timeout = kingsly_http_open_timeout
