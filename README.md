@@ -4,7 +4,7 @@ kingsly-certbot would update the local certs and update them from the ones gener
 
 ## Installation
 
-TODO: Write installion instructions here
+please follow the instructions over at https://github.com/gojekfarm/kingsly-certbot-cookbook
 
 ## Usage
 
@@ -22,6 +22,13 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 $ mkdir /etc/ipsec.d
 $ sudo chown -R $USER:staff /etc/ipsec.d
 $ bundle exec rake
+```
+
+#### Building locally
+
+```
+$ gem build kingsly_certbot.gemspec
+$ gem push kingsly_certbot-<version>.gem
 ```
 
 ## Contributing
