@@ -14,7 +14,7 @@ Style/CommandLiteral:
 Metrics/BlockLength:
   Exclude:
     - 'spec/*'
-    - 'kingsly_certbot.gemspec'
+    - 'kingsly-certbot.gemspec'
 
 Metrics/PerceivedComplexity:
   Max: 8

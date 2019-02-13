@@ -2,5 +2,5 @@
 
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in kingsly_certbot.gemspec
+# Specify your gem's dependencies in kingsly-certbot.gemspec
 gemspec

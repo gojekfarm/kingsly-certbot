@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'kingsly_certbot/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'kingsly_certbot'
+  spec.name          = 'kingsly-certbot'
   spec.version       = KingslyCertbot::VERSION
   spec.authors       = ['FOSS at GO-JEK']
   spec.email         = ['foss+tech@go-jek.com']
