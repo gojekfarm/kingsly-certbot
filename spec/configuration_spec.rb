@@ -5,9 +5,8 @@ RSpec.describe KingslyCertbot do
   let(:environment) { 'test' }
   let(:tld) { 'example.com' }
   let(:sub_domain) { 'www' }
-  let(:host) { 'certbot.com' }
-  let(:user) { 'user' }
-  let(:password) { 'password' }
+  let(:host) { 'localhost' }
+  let(:port) { 8080 }
   let(:server_type) { 'ipsec' }
   let(:ipsec_root) { '/tmp' }
 
@@ -19,8 +18,7 @@ RSpec.describe KingslyCertbot do
         'TOP_LEVEL_DOMAIN' => tld,
         'SUB_DOMAIN' => sub_domain,
         'KINGSLY_SERVER_HOST' => host,
-        'KINGSLY_SERVER_USER' => user,
-        'KINGSLY_SERVER_PASSWORD' => password,
+        'KINGSLY_SERVER_PORT' => port,
         'SERVER_TYPE' => server_type,
         'IPSEC_ROOT' => ipsec_root
       )
@@ -29,8 +27,7 @@ RSpec.describe KingslyCertbot do
       expect(configuration.top_level_domain).to eq(tld)
       expect(configuration.sub_domain).to eq(sub_domain)
       expect(configuration.kingsly_server_host).to eq(host)
-      expect(configuration.kingsly_server_user).to eq(user)
-      expect(configuration.kingsly_server_password).to eq(password)
+      expect(configuration.kingsly_server_port).to eq(port)
       expect(configuration.server_type).to eq(server_type)
       expect(configuration.ipsec_root).to eq(ipsec_root)
     end
@@ -44,13 +41,12 @@ RSpec.describe KingslyCertbot do
         'TOP_LEVEL_DOMAIN' => tld,
         'SUB_DOMAIN' => sub_domain,
         'KINGSLY_SERVER_HOST' => host,
-        'KINGSLY_SERVER_USER' => user,
-        'KINGSLY_SERVER_PASSWORD' => password,
+        'KINGSLY_SERVER_PORT' => port,
         'SERVER_TYPE' => server_type
       }
     end
 
-    %w[TOP_LEVEL_DOMAIN SUB_DOMAIN KINGSLY_SERVER_HOST KINGSLY_SERVER_USER KINGSLY_SERVER_PASSWORD].each do |mandatory|
+    %w[TOP_LEVEL_DOMAIN SUB_DOMAIN KINGSLY_SERVER_HOST KINGSLY_SERVER_PORT].each do |mandatory|
       it "should validate for missing mandatory property #{mandatory}" do
         valid_config.delete(mandatory)
         expect { KingslyCertbot::Configuration.new(valid_config).validate! }.to raise_exception("Missing mandatory config '#{mandatory.downcase}'")

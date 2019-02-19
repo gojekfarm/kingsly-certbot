@@ -71,9 +71,8 @@ RSpec.describe KingslyCertbot::Runner do
         ENVIRONMENT: test
         TOP_LEVEL_DOMAIN: example.com
         SUB_DOMAIN: www
-        KINGSLY_SERVER_HOST: kingsly-test.com
-        KINGSLY_SERVER_USER: user
-        KINGSLY_SERVER_PASSWORD: password
+        KINGSLY_SERVER_HOST: localhost
+        KINGSLY_SERVER_PORT: 8080
         SERVER_TYPE: ipsec
       STR
     )

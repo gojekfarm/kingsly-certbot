@@ -2,8 +2,7 @@ SENTRY_DSN:
 ENVIRONMENT: 'development'
 TOP_LEVEL_DOMAIN: 'example.com'
 SUB_DOMAIN: 'subdomain'
-KINGSLY_SERVER_HOST: 'kingsly.example.com'
-KINGSLY_SERVER_USER: '****'
-KINGSLY_SERVER_PASSWORD: '****'
+KINGSLY_SERVER_HOST: 'localhost'
+KINGSLY_SERVER_PORT: 8080
 SERVER_TYPE: 'ipsec'
 IPSEC_ROOT: ~/ipsec

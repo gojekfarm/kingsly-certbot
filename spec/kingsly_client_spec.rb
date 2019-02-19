@@ -5,18 +5,16 @@ RSpec.describe KingslyCertbot::KingslyClient do
   let(:sub_domain) { 'sample-integration-cert' }
   let(:private_key) { "-----BEGIN RSA PRIVATE KEY-----\nFOO...\n-----END RSA PRIVATE KEY-----\n" }
   let(:full_chain) { "-----BEGIN CERTIFICATE-----\nBAR...\n-----END CERTIFICATE-----\n" }
-  let(:kingsly_server_host) { 'kingsly.something.com' }
-  let(:kingsly_server_user) { 'user' }
-  let(:kingsly_server_password) { 'pass' }
+  let(:kingsly_server_host) { 'localhost' }
+  let(:kingsly_server_port) { 8080 }
 
   it 'kingsly client should return cert bundle' do
-    stub_request(:post, "https://#{kingsly_server_host}/v1/cert_bundles")
+    stub_request(:post, "http://#{kingsly_server_host}:#{kingsly_server_port}/v1/cert_bundles")
       .with(
         body: %({"top_level_domain":"#{top_level_domain}","sub_domain":"#{sub_domain}"}),
         headers: {
           'Accept' => '*/*',
           'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Authorization' => 'Basic dXNlcjpwYXNz',
           'Content-Type' => 'application/json',
           'User-Agent' => 'Ruby'
         }
@@ -28,8 +26,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
       )
 
     cert_bundle = KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
-                                                                kingsly_server_user: kingsly_server_user,
-                                                                kingsly_server_password: kingsly_server_password,
+                                                                kingsly_server_port: kingsly_server_port,
                                                                 top_level_domain: top_level_domain,
                                                                 sub_domain: sub_domain)
 
@@ -39,13 +36,12 @@ RSpec.describe KingslyCertbot::KingslyClient do
   end
 
   it 'returns exception if the authorisation headers are not valid' do
-    stub_request(:post, 'https://kingsly.something.com/v1/cert_bundles')
+    stub_request(:post, "http://#{kingsly_server_host}:#{kingsly_server_port}/v1/cert_bundles")
       .with(
         body: %({"top_level_domain":"#{top_level_domain}","sub_domain":"#{sub_domain}"}),
         headers: {
           'Accept' => '*/*',
           'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Authorization' => 'Basic dXNlcjpwYXNz',
           'Content-Type' => 'application/json',
           'User-Agent' => 'Ruby'
         }
@@ -54,8 +50,7 @@ RSpec.describe KingslyCertbot::KingslyClient do
 
     expect do
       KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
-                                                    kingsly_server_user: kingsly_server_user,
-                                                    kingsly_server_password: kingsly_server_password,
+                                                    kingsly_server_port: kingsly_server_port,
                                                     top_level_domain: top_level_domain,
                                                     sub_domain: sub_domain)
     end
@@ -64,12 +59,11 @@ RSpec.describe KingslyCertbot::KingslyClient do
   end
 
   it 'raises timeout exception when the http_read_timeout exceeds' do
-    stub_request(:post, 'https://kingsly.something.com/v1/cert_bundles').to_timeout
+    stub_request(:post, "http://#{kingsly_server_host}:#{kingsly_server_port}/v1/cert_bundles").to_timeout
 
     expect do
       KingslyCertbot::KingslyClient.get_cert_bundle(kingsly_server_host: kingsly_server_host,
-                                                    kingsly_server_user: kingsly_server_user,
-                                                    kingsly_server_password: kingsly_server_password,
+                                                    kingsly_server_port: kingsly_server_port,
                                                     top_level_domain: top_level_domain,
                                                     sub_domain: sub_domain)
     end

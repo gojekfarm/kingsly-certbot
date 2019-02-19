@@ -39,8 +39,7 @@ module KingslyCertbot
       $logger.info("Querying Kingsly server for certificate to domain #{@configuration.sub_domain}.#{@configuration.top_level_domain}")
       cert_bundle = KingslyClient.get_cert_bundle(
         kingsly_server_host: @configuration.kingsly_server_host,
-        kingsly_server_user: @configuration.kingsly_server_user,
-        kingsly_server_password: @configuration.kingsly_server_password,
+        kingsly_server_port: @configuration.kingsly_server_port,
         top_level_domain: @configuration.top_level_domain,
         sub_domain: @configuration.sub_domain,
         kingsly_http_read_timeout: @configuration.kingsly_http_read_timeout,
