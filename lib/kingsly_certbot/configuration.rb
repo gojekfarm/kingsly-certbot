@@ -7,8 +7,8 @@ module KingslyCertbot
     attr_accessor(*VARS)
 
     def initialize(params = {})
-      @kingsly_http_read_timeout = 120
-      @kingsly_http_open_timeout = 5
+      @kingsly_http_read_timeout = 300
+      @kingsly_http_open_timeout = 20
       @sentry_dsn = params['SENTRY_DSN']
       @environment = params['ENVIRONMENT'] || 'development'
       @top_level_domain = params['TOP_LEVEL_DOMAIN']
