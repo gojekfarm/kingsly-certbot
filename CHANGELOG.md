@@ -6,3 +6,8 @@
 
 - remove basic auth, fix specs
 - start passing port number for communication with kingsly server
+
+
+# 0.3.1
+
+- increase http_read_timeout, http_open_timeout default values.
