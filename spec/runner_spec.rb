@@ -97,8 +97,18 @@ RSpec.describe KingslyCertbot::Runner do
       adapter = double('ipsec_adapter')
       allow(KingslyCertbot::KingslyClient).to receive(:get_cert_bundle).and_return(cert_bundle)
       expect(KingslyCertbot::IpSecCertAdapter).to receive(:new).with(cert_bundle, '/').and_return(adapter)
-      expect(adapter).to receive(:update_assets).once
+      expect(adapter).to receive(:update_assets).and_return(true)
       expect(adapter).to receive(:restart_service).once
+      KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
+    end
+
+    it 'should initialize ipsec adapter and not restart ipsec service if assets are not updated' do
+      cert_bundle = double('')
+      adapter = double('ipsec_adapter')
+      allow(KingslyCertbot::KingslyClient).to receive(:get_cert_bundle).and_return(cert_bundle)
+      expect(KingslyCertbot::IpSecCertAdapter).to receive(:new).with(cert_bundle, '/').and_return(adapter)
+      expect(adapter).to receive(:update_assets).and_return(false)
+      expect(adapter).not_to receive(:restart_service)
       KingslyCertbot::Runner.new(['--config', conf_file]).configure.execute
     end
   end

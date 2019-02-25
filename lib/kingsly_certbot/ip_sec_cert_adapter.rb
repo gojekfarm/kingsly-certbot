@@ -24,7 +24,7 @@ module KingslyCertbot
         existing_cert_content = File.read(cert_filepath)
         if existing_private_key_content == @cert_bundle.private_key && existing_cert_content == @cert_bundle.full_chain
           $logger.info('New certificate file is same as old cert file, skipping updating certificates')
-          return
+          return false
         else
           time = Time.now.strftime('%Y%m%d_%H%M%S')
           backup_dir = "#{cert_backup_dir}/#{time}"
@@ -45,10 +45,11 @@ module KingslyCertbot
       File.open(cert_filepath, 'w') do |f|
         f.write(@cert_bundle.full_chain)
       end
+      return true
     end
 
     def restart_service
-      result = Kernel.system('ipsec restart')
+      result = Kernel.system('systemctl stop strongswan.service; sleep 10; systemctl start strongswan.service; sleep 10')
       $logger.error('ipsec restart command failed') unless result
       result
     end

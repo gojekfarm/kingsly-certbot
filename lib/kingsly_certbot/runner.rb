@@ -52,9 +52,12 @@ module KingslyCertbot
                 else
                   raise "Unsupported server type #{@configuration.server_type}"
                 end
-      adapter.update_assets
-      adapter.restart_service
-      $logger.info("Updated assets for server type #{@configuration.server_type}")
+      if adapter.update_assets
+        adapter.restart_service
+        $logger.info("Updated assets for server type #{@configuration.server_type} :: Restarting service")
+      else
+        $logger.info("The assets are already in their latest change for server type #{@configuration.server_type}. :: Not restarting the service")
+      end
     rescue StandardError => e
       $logger.error('FAILED - Kingsly Certbot execution failed for following reason:')
       $logger.error(e.message)
