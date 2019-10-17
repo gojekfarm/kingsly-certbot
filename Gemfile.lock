@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    kingsly-certbot (0.3.2)
+    kingsly-certbot (0.3.3)
       sentry-raven (~> 2.9, >= 2.9.0)
 
 GEM
