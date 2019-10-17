@@ -49,7 +49,7 @@ module KingslyCertbot
     end
 
     def restart_service
-      result = Kernel.system('systemctl stop strongswan.service; sleep 10; systemctl start strongswan.service; sleep 10')
+      result = Kernel.system('ipsec rereadall && ipsec reload')
       $logger.error('ipsec restart command failed') unless result
       result
     end
