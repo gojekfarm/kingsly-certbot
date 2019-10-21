@@ -113,13 +113,13 @@ RSpec.describe KingslyCertbot::IpSecCertAdapter do
   context 'restart_service' do
     it 'should call ipsec restart and return true if success' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      allow(Kernel).to receive(:system).with('systemctl stop strongswan.service; sleep 10; systemctl start strongswan.service; sleep 10').and_return(true)
+      allow(Kernel).to receive(:system).with('ipsec rereadall && ipsec reload').and_return(true)
       expect(adapter.restart_service).to eq(true)
     end
 
     it 'should return false and print error to standard error if restart_service returns false' do
       adapter = KingslyCertbot::IpSecCertAdapter.new(KingslyCertbot::CertBundle.new(nil, nil, nil, nil))
-      allow(Kernel).to receive(:system).with('systemctl stop strongswan.service; sleep 10; systemctl start strongswan.service; sleep 10').and_return(false)
+      allow(Kernel).to receive(:system).with('ipsec rereadall && ipsec reload').and_return(false)
       expect(adapter.restart_service).to eq(false)
     end
   end
