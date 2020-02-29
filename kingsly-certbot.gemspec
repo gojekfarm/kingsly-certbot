@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 2.0', '>= 2.0.1'
-  spec.add_development_dependency 'rake', '~> 10.5', '>= 10.5.0'
+  spec.add_development_dependency 'rake', '>= 10.5.0', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.8', '>= 3.8.0'
   spec.add_development_dependency 'rubocop', '~> 0.63.1'
   spec.add_development_dependency 'webmock', '~> 3.5', '>= 3.5.1'
